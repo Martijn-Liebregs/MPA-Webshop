@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -11,9 +12,22 @@ class CartController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $cartID = $request->session()->get('shoppingCartList');
+        if(!$cartID) return redirect()->route('home');
+        $cart   = array();
+        dump($cartID);
+        foreach($cartID as $key => $value) {
+            // if(!$value == NULL) {
+                $cart[] = DB::table('products')
+                    ->select('products.id', 'products.name', 'products.price', 'products.image_URL')
+                    ->where('products.id', '=', $value)
+                    ->get()[0];
+            // }
+        }
+        return view('cart')->with('cartContent', $cart);
+        
     }
 
     /**
@@ -84,13 +98,25 @@ class CartController extends Controller
 
     public function addToCart(Request $request, $id)
     {
-
         if(!$request->session()->has('shoppingCartList')){
            $request->session()->put('shoppingCartList', array()); 
         }
 
         $request->session()->push('shoppingCartList', $id);
+
         return back();
-       
+    }
+
+    public function deleteFromCart(Request $request, $id)
+    {
+        $temp = $request->session()->get('shoppingCartList');
+        unset($temp[$id]); 
+        $temp = array_values($temp);
+
+        $request->session()->put('shoppingCartList', $temp); 
+        // $request->session()->get('shoppingCartList')[$id] = NULL;
+        // unset($request->session()->get('shoppingCartList')[$id]);
+
+        return redirect()->route('back');
     }
 }

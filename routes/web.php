@@ -13,14 +13,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'PageController@productPage')->name('home');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
-
-Route::get('/products', 'PageController@productPage');
-
 Route::get('/cart/{id}', 'CartController@addToCart');
+
+Route::get('/cart', 'CartController@index')->name('back');
+
+Route::get('/cart/delete/{id}', 'CartController@deleteFromCart');
