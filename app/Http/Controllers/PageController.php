@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Product;
+use App\ProductsCategory;
 
 class PageController extends Controller
 {
@@ -85,12 +87,7 @@ class PageController extends Controller
 
     public function productPage()
     {
-        $products = DB::table('products')
-            ->join('products_categories', 'products.id', '=', 'products_categories.product_id')
-            ->join('categories', 'categories.id', '=', 'products_categories.categorie_id')
-            ->select('products.*', 'categories.id as categorie_id', 'categories.name as categorie_name')->get();
-
+        $products = Product::with(['category'])->get();
         return view('products')->with('data', $products);
     }
 }
-

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Product;
 
 class CartController extends Controller
 {
@@ -17,14 +17,8 @@ class CartController extends Controller
         $cartID = $request->session()->get('shoppingCartList');
         if(!$cartID) return redirect()->route('home');
         $cart   = array();
-        dump($cartID);
         foreach($cartID as $key => $value) {
-            // if(!$value == NULL) {
-                $cart[] = DB::table('products')
-                    ->select('products.id', 'products.name', 'products.price', 'products.image_URL')
-                    ->where('products.id', '=', $value)
-                    ->get()[0];
-            // }
+            $cart[] = Product::where('id', '=', $value)->first();
         }
         return view('cart')->with('cartContent', $cart);
         
